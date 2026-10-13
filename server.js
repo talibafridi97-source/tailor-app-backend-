@@ -3,9 +3,32 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const { initializeApp, cert } = require('firebase-admin/app');
-const serviceAccount = require('./serviceAccountKey.json');
 
-initializeApp({ credential: cert(serviceAccount) });
+let serviceAccount;
+try {
+  if (process.env.FIREBASE_CONFIG_JSON) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG_JSON);
+  } else {
+    try {
+      serviceAccount = require('./serviceAccountKey.json');
+    } catch (err) {
+      console.warn("Warning: serviceAccountKey.json not found locally.");
+    }
+  }
+} catch (e) {
+  console.error("Firebase Service Account Load Error:", e.message);
+}
+
+if (serviceAccount) {
+  try {
+    initializeApp({ credential: cert(serviceAccount) });
+    console.log("Firebase Admin Initialized Successfully.");
+  } catch (initErr) {
+    console.error("Firebase Init Error:", initErr.message);
+  }
+} else {
+  console.log("Running without Firebase Admin (Push notifications disabled).");
+}
 
 const app = express();
 

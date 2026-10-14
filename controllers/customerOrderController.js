@@ -6,7 +6,7 @@ const createCustomerOrder = async (req, res) => {
   try {
     const {
       clientName, phone, garment, measurements, materials,
-      totalBill, advancePayment, dueAmount, deliveryDate
+      totalBill, advancePayment, dueAmount, deliveryDate, transactionId
     } = req.body;
 
     const shopUser = await User.findOne();
@@ -26,7 +26,8 @@ const createCustomerOrder = async (req, res) => {
       dueAmount: dueAmount || (totalBill - advancePayment),
       deliveryDate: deliveryDate || new Date(Date.now() + 7*24*60*60*1000),
       status: 'pending',
-      isPinned: true
+      isPinned: true,
+      transactionId: transactionId || ''
     });
 
     const savedOrder = await order.save();
@@ -36,11 +37,18 @@ const createCustomerOrder = async (req, res) => {
         await getMessaging().send({
           token: shopUser.fcmToken,
           notification: {
-            title: '🌐 New Online Customer Order!',
-            body: `Order received from ${clientName} for ${garment}.`,
+            title: '🌐 New Online Order & Payment!',
+            body: `Order from ${clientName} (${garment}). TID: ${transactionId || 'Not provided'}`,
+          },
+          android: {
+            notification: {
+              sound: 'default',
+              priority: 'high',
+              channelId: 'high_importance_channel',
+            },
           },
         });
-        console.log('Customer Order FCM Notification sent successfully!');
+        console.log('Customer Order & TID FCM Notification sent successfully!');
       } catch (notifErr) {
         console.error('Customer Order FCM Error:', notifErr.message);
       }

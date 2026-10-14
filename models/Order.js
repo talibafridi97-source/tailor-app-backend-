@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema(
     garment: { 
       type: String, 
       required: true 
-    }, // e.g., Shalwar Kameez, Shirt, Pant
+    },
     measurements: { 
       type: Map, 
       of: String, 
@@ -30,7 +30,7 @@ const orderSchema = new mongoose.Schema(
     },
     materials: [{ 
       type: String 
-    }], // Fabric, Buttons, etc.
+    }],
     totalBill: { 
       type: Number, 
       required: true, 
@@ -61,10 +61,12 @@ const orderSchema = new mongoose.Schema(
       type: Boolean, 
       default: false 
     },
-    
-    // === YE NAYI LINE ADD KI HAI (Worker Tracking ke liye) ===
-    karigarName: { 
-      type: String, 
+    karigarName: {
+      type: String,
+      default: ''
+    },
+    transactionId: {
+      type: String,
       default: '' 
     },
   },

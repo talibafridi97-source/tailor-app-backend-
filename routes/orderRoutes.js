@@ -27,7 +27,7 @@ router.post('/', protect, async (req, res) => {
       orderDate: orderDate || Date.now(),
       deliveryDate: deliveryDate || Date.now(),
       isPinned: isPinned || false,
-      karigarName: karigarName || '' // <--- Karigar Name yahan save hoga
+      karigarName: karigarName || ''
     });
 
     const savedOrder = await order.save();
@@ -41,6 +41,13 @@ router.post('/', protect, async (req, res) => {
           notification: {
             title: '📦 New Order Created!',
             body: `Order for ${clientName || 'Client'} has been added successfully.`,
+          },
+          android: {
+            notification: {
+              sound: 'default',
+              priority: 'high',
+              channelId: 'high_importance_channel',
+            },
           },
         });
         console.log('FCM Notification sent successfully!');
